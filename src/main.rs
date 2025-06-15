@@ -22,7 +22,7 @@ fn coords_to_square(coord: &str) -> Option<Square> {
     }
 
     let file_idx = file - b'a';
-    let rank_idx = 8 - (rank - b'1');
+    let rank_idx = rank - b'1';
     Some(rank_idx * 16 + file_idx)
 }
 fn engine_make_move(board: &mut Board, engine_color: Color) -> bool {
@@ -170,9 +170,9 @@ impl Board {
 
         let white_back = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
         for (i, &kind) in white_back.iter().enumerate() {
-            self.set_piece(0x70 + i as u8, Piece { color: White, kind });
+            self.set_piece(0x00 + i as u8, Piece { color: White, kind });
             self.set_piece(
-                0x60 + i as u8,
+                0x10 + i as u8,
                 Piece {
                     color: White,
                     kind: Pawn,
@@ -182,9 +182,9 @@ impl Board {
 
         let black_back = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
         for (i, &kind) in black_back.iter().enumerate() {
-            self.set_piece(0x00 + i as u8, Piece { color: Black, kind });
+            self.set_piece(0x70 + i as u8, Piece { color: Black, kind });
             self.set_piece(
-                0x10 + i as u8,
+                0x60 + i as u8,
                 Piece {
                     color: Black,
                     kind: Pawn,
@@ -297,8 +297,8 @@ pub fn generate_king_moves(board: &Board, from: Square, color: Color) -> Vec<Squ
 
 pub fn generate_pawn_moves(board: &Board, from: Square, color: Color) -> Vec<Square> {
     let mut moves = Vec::new();
-    let dir = if color == Color::White { -16 } else { 16 };
-    let start_rank = if color == Color::White { 6 } else { 1 };
+    let dir = if color == Color::White { 16 } else { -16 };
+    let start_rank = if color == Color::White { 1 } else { 6 };
     let rank = from >> 4;
 
     let one_step = (from as i16 + dir) as u8;
@@ -348,7 +348,7 @@ fn piece_char(piece: Piece) -> char {
 fn square_to_coords(square: Square) -> Option<String> {
     if Board::is_valid(square) {
         let file = (square & 0x7) as u8;
-        let rank = 8 - (square >> 4);
+        let rank = (square >> 4) + 1;
         Some(format!("{}{}", (b'a' + file) as char, rank))
     } else {
         None
