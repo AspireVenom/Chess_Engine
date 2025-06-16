@@ -369,7 +369,7 @@ impl Board {
         for rank in 0..8 {
             print!("{} ", 8 - rank);
             for file in 0..8 {
-                let sq = (7 - rank) * 16 + file;
+                let sq = rank * 16 + file;
                 match self.get_piece(sq) {
                     Some(p) => print!("{} ", piece_char(p)),
                     None => print!(". "),
@@ -451,6 +451,15 @@ impl Board {
         let pseudo_moves = self.generate_pseudo_moves_for_piece(from);
 
         for &to in &pseudo_moves {
+            // Check if destination square has a piece of the same color
+            if let Some(target_piece) = self.get_piece(to) {
+                if let Some(moving_piece) = self.get_piece(from) {
+                    if target_piece.color == moving_piece.color {
+                        continue; // Skip if trying to capture own piece
+                    }
+                }
+            }
+
             let mut cloned = self.clone();
             cloned.make_move(from, to);
             if let Some(piece) = self.get_piece(from) {
@@ -506,7 +515,7 @@ pub fn generate_knight_moves(board: &Board, from: Square) -> Vec<Square> {
     let mut moves = Vec::new();
     if let Some(piece) = board.get_piece(from) {
         for &offset in &KNIGHT_OFFSETS {
-            let to = from.wrapping_add(offset as u8);
+            let to = (from as i16 + offset as i16) as u8;
             if Board::is_valid(to) {
                 match board.get_piece(to) {
                     Some(target) if target.color == piece.color => {}
@@ -538,17 +547,7 @@ pub fn generate_pawn_moves(board: &Board, from: Square, color: Color) -> Vec<Squ
     let start_rank = if color == Color::White { 6 } else { 1 }; // Fixed starting ranks
     let rank = from >> 4;
 
-    let one_step = (from as i16 + dir) as u8;
-    if Board::is_valid(one_step) && board.get_piece(one_step).is_none() {
-        moves.push(one_step);
-        if rank == start_rank {
-            let two_step = (from as i16 + 2 * dir) as u8;
-            if board.get_piece(two_step).is_none() {
-                moves.push(two_step);
-            }
-        }
-    }
-
+    // Check diagonal captures first
     for &offset in &[dir - 1, dir + 1] {
         let to = (from as i16 + offset) as u8;
         if Board::is_valid(to) {
@@ -556,6 +555,18 @@ pub fn generate_pawn_moves(board: &Board, from: Square, color: Color) -> Vec<Squ
                 if target.color != color {
                     moves.push(to);
                 }
+            }
+        }
+    }
+
+    // Then check forward moves
+    let one_step = (from as i16 + dir) as u8;
+    if Board::is_valid(one_step) && board.get_piece(one_step).is_none() {
+        moves.push(one_step);
+        if rank == start_rank {
+            let two_step = (from as i16 + 2 * dir) as u8;
+            if board.get_piece(two_step).is_none() {
+                moves.push(two_step);
             }
         }
     }
