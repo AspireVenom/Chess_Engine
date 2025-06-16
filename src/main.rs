@@ -174,14 +174,7 @@ fn evaluate(board: &Board, color: Color) -> i32 {
             continue;
         }
         if let Some(piece) = board.get_piece(sq) {
-            let value = match piece.kind {
-                PieceType::Pawn => PIECE_VALUES[0],
-                PieceType::Knight => PIECE_VALUES[1],
-                PieceType::Bishop => PIECE_VALUES[2],
-                PieceType::Rook => PIECE_VALUES[3],
-                PieceType::Queen => PIECE_VALUES[4],
-                PieceType::King => PIECE_VALUES[5],
-            };
+            let value = get_piece_value(piece.kind);
             let piece_value = if piece.color == color { value } else { -value };
             let pst_value = if piece.color == color {
                 get_pst_value(sq, piece.kind, color)
