@@ -1,79 +1,70 @@
 # Rust Chess Engine
 
-A chess engine written in Rust that implements a negamax search algorithm with alpha-beta pruning and various chess-specific optimizations.
+A chess engine written in Rust that implements a complete chess game with move generation, validation, and AI opponent.
 
 ## Features
 
-- Complete chess rules implementation
-- Move generation for all piece types
-- Legal move validation
-- Negamax search with alpha-beta pruning
-- Position evaluation using:
-  - Material value
-  - Piece-square tables
-  - MVV-LVA move ordering
+- Complete chess move generation for all pieces
+- Legal move validation including:
+  - Check detection
+  - Preventing moves that leave king in check
+  - Proper piece capture rules
 - Interactive command-line interface
+- AI opponent using:
+  - Negamax search algorithm with alpha-beta pruning
+  - Iterative deepening
+  - Move ordering with MVV-LVA (Most Valuable Victim - Least Valuable Attacker)
+  - Position evaluation using:
+    - Material counting
+    - Piece-square tables for positional evaluation
+    - Mobility evaluation
 
-## Technical Details
+## Board Representation
 
-### Search Algorithm
-- Negamax implementation with alpha-beta pruning
-- Iterative deepening search
-- Move ordering using MVV-LVA (Most Valuable Victim - Least Valuable Attacker)
-- Maximum search depth configurable via `MAX_DEPTH`
+The engine uses the 0x88 board representation, which provides:
+- Efficient move generation
+- Fast attack detection
+- Easy boundary checking
 
-### Position Evaluation
-- Material evaluation with standard piece values
-- Piece-square tables for positional evaluation
-- Separate tables for different piece types
-- Opening and middlegame considerations
+## Move Generation
 
-### Board Representation
-- Uses 0x88 board representation for efficient move generation
-- 128-square board (16x8) with invalid squares marked
-- Efficient square validation and move generation
+The engine supports all standard chess moves:
+- Pawn moves (including first move two squares and diagonal captures)
+- Knight moves in L-shape pattern
+- Bishop diagonal moves
+- Rook horizontal and vertical moves
+- Queen moves (combination of rook and bishop)
+- King moves (one square in any direction)
 
-## Building and Running
+## AI Features
 
-### Prerequisites
-- Rust and Cargo installed on your system
+The AI opponent uses several chess-specific optimizations:
+1. Negamax search with alpha-beta pruning for efficient tree traversal
+2. Iterative deepening for better move selection
+3. Move ordering using MVV-LVA to improve alpha-beta pruning efficiency
+4. Position evaluation using:
+   - Material counting (piece values)
+   - Piece-square tables for positional evaluation
+   - Mobility evaluation
 
-### Building
-```bash
-cargo build
-```
+## Usage
 
-### Running
+Run the engine with:
 ```bash
 cargo run
 ```
 
-## Usage
-
-1. Start the game by running the executable
-2. The board will be displayed with standard chess notation
-3. Enter moves in the format "e2 e4" (from square to square)
-4. The engine will respond with its move
-5. Type 'exit' to quit the game
-
-## Move Input Format
-- Use standard algebraic notation
-- Format: "from_square to_square"
-- Example: "e2 e4" for a pawn move
-- Files are a-h, ranks are 1-8
+Enter moves in the format "e2 e4" (from square to square).
 
 ## Future Improvements
 
 Potential areas for enhancement:
-- Transposition tables for position caching
-- Quiescence search for better tactical play
-- Opening book implementation
-- UCI protocol support
-- Improved evaluation with:
-  - Mobility evaluation
-  - Pawn structure analysis
-  - King safety evaluation
-  - Endgame tablebases
+- Transposition tables for better move caching
+- Opening book integration
+- Endgame tablebase support
+- More sophisticated evaluation function
+- UCI protocol support for compatibility with chess GUIs
+- Multi-threading support for parallel search
 
 ## License
 
